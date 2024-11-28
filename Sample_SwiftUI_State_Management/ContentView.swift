@@ -35,9 +35,13 @@ struct ContentView: View {
 }
 
 struct ChildViewA: View {
+    struct ChildViewA2State {
+        var count = 0
+        var image: UIImage?
+    }
+    
     let borderColor: Color
-    @State private var count = 0
-    @State private var image: UIImage?
+    @State private var state: ChildViewA2State = .init()
     
     init(borderColor: Color) {
         self.borderColor = borderColor
@@ -45,14 +49,14 @@ struct ChildViewA: View {
     
     var body: some View {
         HStack {
-            if let image = image {
+            if let image = state.image {
                 Image(uiImage: image)
                     .resizable()
             }else {
                 Color.gray
             }
             VStack {
-                Text("今は\(count)番の画像")
+                Text("今は\(state.count)番の画像")
                 
                 Spacer().frame(height: 40)
                 
@@ -68,17 +72,17 @@ struct ChildViewA: View {
     }
     
     func update() {
-        if count == 2 {
-            count = 0
+        if state.count == 2 {
+            state.count = 0
         }else {
-            count += 1
+            state.count += 1
         }
         
         Task {
             do {
-                self.image = try await DataSource.getImage(from: URL(string: DataSource.imageUrls[count])!)
-                print("image: \(image)")
-                print("代入した: \(self.image)")
+                self.state.image = try await DataSource.getImage(from: URL(string: DataSource.imageUrls[state.count])!)
+                print("image: \(state.image)")
+                print("代入した: \(self.state.image)")
             }catch {
                 print(error)
             }
@@ -112,7 +116,6 @@ class ChildViewBState: ObservableObject {
 struct ChildViewB: View {
     let borderColor: Color
     @StateObject var state = ChildViewBState()
-//    @ObservedObject var state: ChildViewBState
     
     /* 
      下記の書き方だと、親ビューの再描画でObservableObjectのインスタンスも再生成されるので状態がリセットされてしまう
