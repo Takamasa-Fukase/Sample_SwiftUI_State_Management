@@ -8,13 +8,22 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State var id = UUID()
+    
     var body: some View {
         VStack {
             ChildViewA()
                 .frame(width: .infinity, height: 200)
             ChildViewB()
                 .frame(width: .infinity, height: 200)
+            Button {
+                id = .init()
+            } label: {
+                Text("再描画")
+            }
+            Text("id: \(id.uuidString)")
         }
+        .id(id)
         .padding()
     }
 }
