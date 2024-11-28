@@ -8,22 +8,24 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State var id = UUID()
+    @State var color = Color.red
     
     var body: some View {
         VStack {
-            ChildViewA()
+            ChildViewA(borderColor: color)
                 .frame(width: .infinity, height: 200)
-            ChildViewB()
+            ChildViewB(borderColor: color)
                 .frame(width: .infinity, height: 200)
             Button {
-                id = .init()
+                if color == .red {
+                    color = .blue
+                }else {
+                    color = .red
+                }
             } label: {
-                Text("再描画")
+                Text("親ビューを再描画")
             }
-            Text("id: \(id.uuidString)")
         }
-        .id(id)
         .padding()
     }
 }
@@ -33,8 +35,13 @@ struct ContentView: View {
 }
 
 struct ChildViewA: View {
-    @State var count = 0
-    @State var image: UIImage?
+    let borderColor: Color
+    @State private var count = 0
+    @State private var image: UIImage?
+    
+    init(borderColor: Color) {
+        self.borderColor = borderColor
+    }
     
     var body: some View {
         HStack {
@@ -56,6 +63,8 @@ struct ChildViewA: View {
                 }
             }
         }
+        .padding(.all, 16)
+        .border(borderColor, width: 10)
     }
     
     func update() {
@@ -101,7 +110,12 @@ class ChildViewBState: ObservableObject {
 }
 
 struct ChildViewB: View {
+    let borderColor: Color
     @StateObject var state = ChildViewBState()
+    
+    init(borderColor: Color) {
+        self.borderColor = borderColor
+    }
     
     var body: some View {
         HStack {
@@ -123,6 +137,8 @@ struct ChildViewB: View {
                 }
             }
         }
+        .padding(.all, 16)
+        .border(borderColor, width: 10)
     }
 }
 
