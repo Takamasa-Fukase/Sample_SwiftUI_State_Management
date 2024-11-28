@@ -35,13 +35,13 @@ struct ContentView: View {
 }
 
 struct ChildViewA: View {
-    struct ChildViewA2State {
+    struct ChildViewAState {
         var count = 0
         var image: UIImage?
     }
     
     let borderColor: Color
-    @State private var state: ChildViewA2State = .init()
+    @State private var state: ChildViewAState = .init()
     
     init(borderColor: Color) {
         self.borderColor = borderColor
