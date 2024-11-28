@@ -77,31 +77,9 @@ struct ChildViewA: View {
     }
 }
 
-struct ChildViewB: View {
-    @State var count = 0
-    @State var image: UIImage?
-    
-    var body: some View {
-        HStack {
-            if let image = image {
-                Image(uiImage: image)
-                    .resizable()
-            }else {
-                Color.gray
-            }
-            VStack {
-                Text("今は\(count)番の画像")
-                
-                Spacer().frame(height: 40)
-                
-                Button {
-                    update()
-                } label: {
-                    Text("更新")
-                }
-            }
-        }
-    }
+class ChildViewBState: ObservableObject {
+    @Published var count: Int = 0
+    @Published var image: UIImage?
     
     func update() {
         if count == 2 {
@@ -117,6 +95,32 @@ struct ChildViewB: View {
                 print("代入した: \(self.image)")
             }catch {
                 print(error)
+            }
+        }
+    }
+}
+
+struct ChildViewB: View {
+    @StateObject var state = ChildViewBState()
+    
+    var body: some View {
+        HStack {
+            if let image = state.image {
+                Image(uiImage: image)
+                    .resizable()
+            }else {
+                Color.gray
+            }
+            VStack {
+                Text("今は\(state.count)番の画像")
+                
+                Spacer().frame(height: 40)
+                
+                Button {
+                    state.update()
+                } label: {
+                    Text("更新")
+                }
             }
         }
     }
