@@ -14,6 +14,8 @@ struct ContentView: View {
         VStack {
             ChildViewA(borderColor: color)
                 .frame(width: .infinity, height: 200)
+            ChildViewA_2(borderColor: color)
+                .frame(width: .infinity, height: 200)
             ChildViewB(borderColor: color)
                 .frame(width: .infinity, height: 200)
             Button {
@@ -87,6 +89,67 @@ struct ChildViewA: View {
                 print(error)
             }
         }
+    }
+}
+
+struct ChildViewA_2: View {
+    struct ChildViewA_2State {
+        var count = 0
+        var image: UIImage?
+    }
+    
+    struct Logic {
+        static func nextCount(count: Int) -> Int {
+            if count == 2 {
+                return 0
+            }else {
+                return count + 1
+            }
+        }
+        
+        static func fetch(count: Int, result: @escaping ((UIImage) -> Void)) {
+            Task {
+                do {
+                    result(try await DataSource.getImage(from: URL(string: DataSource.imageUrls[count])!))
+                }catch {
+                    print(error)
+                }
+            }
+        }
+    }
+    
+    let borderColor: Color
+    @State private var state: ChildViewA_2State = .init()
+    
+    init(borderColor: Color) {
+        self.borderColor = borderColor
+    }
+    
+    var body: some View {
+        HStack {
+            if let image = state.image {
+                Image(uiImage: image)
+                    .resizable()
+            }else {
+                Color.gray
+            }
+            VStack {
+                Text("今は\(state.count)番の画像")
+                
+                Spacer().frame(height: 40)
+                
+                Button {
+                    state.count = Logic.nextCount(count: state.count)
+                    Logic.fetch(count: state.count) { image in
+                        state.image = image
+                    }
+                } label: {
+                    Text("更新")
+                }
+            }
+        }
+        .padding(.all, 16)
+        .border(borderColor, width: 10)
     }
 }
 
