@@ -34,12 +34,6 @@ struct ContentView: View {
 
 struct ChildViewA: View {
     @State var count = 0
-    var imageUrls: [String] = [
-        "https://cdn.macaro-ni.jp/image/summary/32/32145/d642febe8bc7c7d31cc0b002ae327473.jpg?p=1x1",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC74P5Y1lSq0q-38xX-TB6CzhX_79CAEyP3A&s",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsV6BmIOP3qg5IyYOGuiRvYrnIq3Ksd946zw&s"
-    ]
-    
     @State var image: UIImage?
     
     var body: some View {
@@ -71,7 +65,7 @@ struct ChildViewA: View {
         
         Task {
             do {
-                let (data, _) = try await URLSession(configuration: .default).data(from: URL(string: imageUrls[count])!)
+                let (data, _) = try await URLSession(configuration: .default).data(from: URL(string: DataSource.imageUrls[count])!)
                 self.image = UIImage(data: data)
                 print("data: \(data)")
                 print("代入した: \(self.image)")
@@ -80,21 +74,9 @@ struct ChildViewA: View {
             }
         }
     }
-    
-    private func getImage(from url: URL) async throws -> UIImage {
-        let session = URLSession(configuration: .default)
-        let (data, _) = try await session.data(from: url)
-        return UIImage(data: data) ?? UIImage()
-    }
 }
 
 struct ChildViewB: View {
-    var imageUrls: [String] = [
-        "https://cdn.macaro-ni.jp/image/summary/32/32145/d642febe8bc7c7d31cc0b002ae327473.jpg?p=1x1",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC74P5Y1lSq0q-38xX-TB6CzhX_79CAEyP3A&s",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsV6BmIOP3qg5IyYOGuiRvYrnIq3Ksd946zw&s"
-    ]
-    
     var image: UIImage?
     
     var body: some View {
@@ -107,6 +89,20 @@ struct ChildViewB: View {
     }
     
     private func getImage(from url: URL) async throws -> UIImage {
+        let session = URLSession(configuration: .default)
+        let (data, _) = try await session.data(from: url)
+        return UIImage(data: data) ?? UIImage()
+    }
+}
+
+struct DataSource {
+    static let imageUrls = [
+        "https://cdn.macaro-ni.jp/image/summary/32/32145/d642febe8bc7c7d31cc0b002ae327473.jpg?p=1x1",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTC74P5Y1lSq0q-38xX-TB6CzhX_79CAEyP3A&s",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsV6BmIOP3qg5IyYOGuiRvYrnIq3Ksd946zw&s"
+    ]
+    
+    static func getImage(from url: URL) async throws -> UIImage {
         let session = URLSession(configuration: .default)
         let (data, _) = try await session.data(from: url)
         return UIImage(data: data) ?? UIImage()
