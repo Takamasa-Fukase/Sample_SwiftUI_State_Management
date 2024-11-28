@@ -42,11 +42,13 @@ struct ChildViewA: View {
                 Image(uiImage: image)
                     .resizable()
             }else {
-                Color.red
+                Color.gray
             }
             VStack {
                 Text("今は\(count)番の画像")
+                
                 Spacer().frame(height: 40)
+                
                 Button {
                     update()
                 } label: {
@@ -65,9 +67,8 @@ struct ChildViewA: View {
         
         Task {
             do {
-                let (data, _) = try await URLSession(configuration: .default).data(from: URL(string: DataSource.imageUrls[count])!)
-                self.image = UIImage(data: data)
-                print("data: \(data)")
+                self.image = try await DataSource.getImage(from: URL(string: DataSource.imageUrls[count])!)
+                print("image: \(image)")
                 print("代入した: \(self.image)")
             }catch {
                 print(error)
@@ -77,21 +78,47 @@ struct ChildViewA: View {
 }
 
 struct ChildViewB: View {
-    var image: UIImage?
+    @State var count = 0
+    @State var image: UIImage?
     
     var body: some View {
-        if let image = image {
-            Image(uiImage: image)
-                .resizable()
-        }else {
-            Color.blue
+        HStack {
+            if let image = image {
+                Image(uiImage: image)
+                    .resizable()
+            }else {
+                Color.gray
+            }
+            VStack {
+                Text("今は\(count)番の画像")
+                
+                Spacer().frame(height: 40)
+                
+                Button {
+                    update()
+                } label: {
+                    Text("更新")
+                }
+            }
         }
     }
     
-    private func getImage(from url: URL) async throws -> UIImage {
-        let session = URLSession(configuration: .default)
-        let (data, _) = try await session.data(from: url)
-        return UIImage(data: data) ?? UIImage()
+    func update() {
+        if count == 2 {
+            count = 0
+        }else {
+            count += 1
+        }
+        
+        Task {
+            do {
+                self.image = try await DataSource.getImage(from: URL(string: DataSource.imageUrls[count])!)
+                print("image: \(image)")
+                print("代入した: \(self.image)")
+            }catch {
+                print(error)
+            }
+        }
     }
 }
 
