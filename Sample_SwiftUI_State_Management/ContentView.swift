@@ -112,8 +112,17 @@ class ChildViewBState: ObservableObject {
 struct ChildViewB: View {
     let borderColor: Color
     @StateObject var state = ChildViewBState()
+//    @ObservedObject var state: ChildViewBState
     
-    init(borderColor: Color) {
+    /* 
+     下記の書き方だと、親ビューの再描画でObservableObjectのインスタンスも再生成されるので状態がリセットされてしまう
+     @ObservedObject var state = ChildViewBState()
+     @ObservedObjectを使う場合でも、子ビュー内部でインスタンス化せずに、親ビューでインスタンス化して保持しているものを注入すればこれは防げるが、そうすると子ビューが破棄されても注入したオブジェクトは自動的には破棄されないので別途連動して破棄させる仕組みを考慮する必要があるが、それをしたくないならStateObjectにすれば自動でビューと一緒にオブジェクトも破棄してもらえるので考えなくてよくなる。
+     */
+    
+    init(
+        borderColor: Color
+    ) {
         self.borderColor = borderColor
     }
     
